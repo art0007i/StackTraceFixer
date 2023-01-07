@@ -16,15 +16,21 @@ namespace StackTraceFixer
     {
         public override string Name => "StackTraceFixer";
         public override string Author => "art0007i";
-        public override string Version => "1.0.0";
+        public override string Version => "1.0.1";
         public override string Link => "https://github.com/art0007i/StackTraceFixer/";
 
         private const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance;
 
         public static HashSet<MethodInfo> toPatch = new HashSet<MethodInfo>
         {
+            // I had a lot of stack traces related to this in my log once... all of them showed some useless calls
             AccessTools.TypeByName("FrooxEngine.LogiX.LogixHelper+<EnumerateAllReachableNodes>d__17").GetMethod("MoveNext", flags),
+            // This happens whenever you change name or description of a world... really annoying
             typeof(WorldConfiguration).GetMethod("FieldChanged", flags),
+            // This happens whenever you try to write to a driven field... really not uncommon and definitely doesn't require a stack trace
+            typeof(SyncElement).GetMethod("BeginModification", flags),
+            // This happens whenever a user is destroyed...
+            typeof(PermissionController).GetMethod("UpdateManager_UpdatableChanged", flags),
 
             // if you want more stack traces to be stopped just add them here!
         };
